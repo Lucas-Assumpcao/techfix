@@ -219,3 +219,9 @@ INSERT INTO pecas (nome_pecas, id_categoria, preco_compra, preco_venda, estoque,
 ('Fusível de Louça 5A 250V (Pacote c/ 10)', 7, 500, 1800, 20, 1, 1),
 ('Capacitor Eletrolítico 1000uF x 25V', 7, 80, 500, 150, 1, 1);
 
+SELECT *FROM pecas WHERE preco_venda >= 10000;
+
+CREATE VIEW VW_preco_venda  AS 
+SELECT id, nome_pecas, preco_venda, estoque FROM pecas WHERE preco_venda >= 10000;
+
+SELECT * FROM VW_preco_venda;
