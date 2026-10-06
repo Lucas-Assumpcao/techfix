@@ -225,3 +225,114 @@ CREATE VIEW VW_preco_venda  AS
 SELECT id, nome_pecas, preco_venda, estoque FROM pecas WHERE preco_venda >= 10000;
 
 SELECT * FROM VW_preco_venda;
+
+-- 9. Tabela marca
+CREATE TABLE IF NOT EXISTS marca (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_marca TEXT NOT NULL COLLATE NOCASE,
+    status INTEGER NOT NULL DEFAULT 1,
+    id_funcionario INTEGER NOT NULL,
+    id_funcionario_cargo INTEGER NOT NULL,
+    data_cadastro TEXT NOT NULL DEFAULT (DATETIME('now','localtime'))
+);
+
+-- 10. Tabela modelo
+CREATE TABLE IF NOT EXISTS modelo (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_marca TEXT NOT NULL COLLATE NOCASE,
+    status INTEGER NOT NULL DEFAULT 1,
+    id_funcionario INTEGER NOT NULL,
+    id_funcionario_cargo INTEGER NOT NULL,
+    data_cadastro TEXT NOT NULL DEFAULT (DATETIME('now','localtime'))
+);
+
+-- 11. Tabela tipo
+CREATE TABLE IF NOT EXISTS tipo (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_marca TEXT NOT NULL COLLATE NOCASE,
+    status INTEGER NOT NULL DEFAULT 1,
+    id_funcionario INTEGER NOT NULL,
+    id_funcionario_cargo INTEGER NOT NULL,
+    data_cadastro TEXT NOT NULL DEFAULT (DATETIME('now','localtime'))
+);
+
+-- 12. Tabela situacao
+CREATE TABLE IF NOT EXISTS situacao (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_situacao TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    status INTEGER NOT NULL DEFAULT 1
+);
+
+-- 1. Tabela forma_pagamento
+CREATE TABLE forma_pagamento (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome_forma_pagamento TEXT NOT NULL COLLATE NOCASE UNIQUE,
+    id_funcionario INTEGER NOT NULL,
+    id_funcionario_cargo INTEGER NOT NULL CHECK (id_funcionario_cargo = 1),
+    data_cadastro TEXT NOT NULL DEFAULT (DATETIME('now','localtime')),
+    status INTEGER NOT NULL DEFAULT 1,
+    FOREIGN KEY(id_funcionario, id_funcionario_cargo) REFERENCES funcionario(id, id_cargo)
+);
+
+-- 5. Tabela ordem
+CREATE TABLE IF NOT EXISTS ordem (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_equipamento INTEGER NOT NULL,
+    id_funcionario_abertura INTEGER NOT NULL,
+    id_funcionario_cargo_abertura INTEGER NOT NULL,
+    data_abertura TEXT NOT NULL DEFAULT (DATETIME('now','localtime')),
+    id_situacao_atual INTEGER NOT NULL,
+    data_fechamento TEXT,
+    descricao_defeito TEXT NOT NULL COLLATE NOCASE,
+    descricao_constatado TEXT COLLATE NOCASE,
+    valor_total INTEGER,
+    id_forma_pagamento INTEGER NOT NULL,
+    id_tecnico INTEGER NOT NULL,
+    id_tecnico_cargo INTEGER NOT NULL CHECK (id_tecnico_cargo = 3),
+    FOREIGN KEY (id_forma_pagamento) REFERENCES forma_pagamento (id),
+    FOREIGN KEY (id_situacao_atual) REFERENCES situacao (id),
+    FOREIGN KEY (id_tecnico) REFERENCES funcionario (id)
+);
+
+-- 6. Tabela ordem_situacao
+CREATE TABLE IF NOT EXISTS ordem_situacao (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_ordem INTEGER NOT NULL,
+    id_situacao INTEGER NOT NULL,
+    id_tecnico INTEGER NOT NULL,
+    id_tecnico_cargo INTEGER NOT NULL CHECK (id_tecnico_cargo = 3),
+    data_situacao TEXT NOT NULL DEFAULT (DATETIME('now','localtime')),
+    FOREIGN KEY (id_ordem) REFERENCES ordem (id),
+    FOREIGN KEY (id_situacao) REFERENCES situacao (id),
+    FOREIGN KEY (id_tecnico) REFERENCES funcionario (id)
+);
+
+-- 7. Tabela ordem_pecas
+CREATE TABLE IF NOT EXISTS ordem_pecas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_ordem INTEGER NOT NULL,
+    id_pecas INTEGER NOT NULL,
+    quantidade INTEGER NOT NULL,
+    valor_unitario INTEGER NOT NULL,
+    id_tecnico INTEGER NOT NULL,
+    id_tecnico_cargo INTEGER NOT NULL CHECK (id_tecnico_cargo = 3),
+    data_saida TEXT NOT NULL DEFAULT (DATETIME('now','localtime')),
+    FOREIGN KEY (id_ordem) REFERENCES ordem (id),
+    FOREIGN KEY (id_pecas) REFERENCES pecas (id),
+    FOREIGN KEY (id_tecnico) REFERENCES funcionario (id)
+);
+
+-- 8. Tabela ordem_servico
+CREATE TABLE IF NOT EXISTS ordem_servico (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id_ordem INTEGER NOT NULL,
+    id_servico INTEGER NOT NULL,
+    id_tecnico INTEGER NOT NULL,
+    quantidade INTEGER NOT NULL,
+    valor_unitario INTEGER NOT NULL,
+    id_tecnico_cargo INTEGER NOT NULL CHECK (id_tecnico_cargo = 3),
+    data_execucao TEXT NOT NULL,
+    FOREIGN KEY (id_ordem) REFERENCES ordem (id),
+    FOREIGN KEY (id_servico) REFERENCES servicos (id),
+    FOREIGN KEY (id_tecnico) REFERENCES funcionario (id)
+);
